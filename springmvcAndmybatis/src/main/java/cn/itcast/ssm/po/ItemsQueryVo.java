@@ -1,5 +1,7 @@
 package cn.itcast.ssm.po;
 
+import java.util.List;
+
 /**
  * 
  * <p>Title: ItemsQueryVo</p>
@@ -13,6 +15,17 @@ public class ItemsQueryVo {
 	
 	//为了系统 可扩展性，对原始生成的po进行扩展
 	private ItemsCustom itemsCustom;
+
+	public List<ItemsCustom> getItemsList() {
+		return itemsList;
+	}
+
+	public void setItemsList(List<ItemsCustom> itemsList) {
+		this.itemsList = itemsList;
+	}
+
+	//批量商品信息
+	private List<ItemsCustom> itemsList;
 
 	public Items getItems() {
 		return items;

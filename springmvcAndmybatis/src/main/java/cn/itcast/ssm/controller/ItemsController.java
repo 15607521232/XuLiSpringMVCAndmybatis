@@ -1,18 +1,26 @@
 package cn.itcast.ssm.controller;
 
+import cn.itcast.ssm.controller.validation.ValidGroup1;
+import cn.itcast.ssm.exception.CustomException;
 import cn.itcast.ssm.po.ItemsCustom;
+import cn.itcast.ssm.po.ItemsQueryVo;
 import cn.itcast.ssm.service.ItemsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 
 @Controller
@@ -25,15 +33,26 @@ public class ItemsController {
     @Autowired
     private ItemsService itemsService;
 
+    //商品分类
+    //itemtypes表示最终将方法返回值放在request中的key
+    @ModelAttribute("itemtypes")
+    public Map<String,String> getItemTypes(){
+        Map<String,String> itemTypes = new HashMap<String, String>();
+        itemTypes.put("101", "数码");
+        itemTypes.put("102", "母婴");
+        return itemTypes;
+    }
+
 
     //商品查询
     @RequestMapping(value = "/queryItems",method = {RequestMethod.GET,RequestMethod.POST})
-    public ModelAndView queryItems(HttpServletRequest request) throws Exception {
+    public ModelAndView queryItems(HttpServletRequest request, ItemsQueryVo itemsQueryVo) throws Exception {
 
-        request.getParameter("id");
+
+        System.out.println(request.getParameter("id"));
 
         //调用service查找数据库，查询商品列表
-        List<ItemsCustom> itemsCustomList = itemsService.findItemsList(null);
+        List<ItemsCustom> itemsCustomList = itemsService.findItemsList(itemsQueryVo);
 
 
         //返回ModelAndView
@@ -75,6 +94,11 @@ public class ItemsController {
         //调用service根据商品id查询商品信息
         ItemsCustom itemsCustom = itemsService.findItemsById(items_id);
 
+        //判断商品是否为空，根据id没有差选到商品，抛出异常，提示用户商品信息不存在
+        if(itemsCustom == null){
+            throw new CustomException("修改的商品信息不存在");
+        }
+
         //返回ModelAndView
         //ModelAndView modelAndView = new ModelAndView();
 
@@ -98,9 +122,32 @@ public class ItemsController {
 
     //商品信息修改提交
     @RequestMapping("/editItemsSubmit")
-    public String editItemsSubmit(HttpServletRequest request,Integer id, ItemsCustom itemsCustom) throws Exception{
+    public String editItemsSubmit(Model model, HttpServletRequest request, Integer id,
+                                  @Validated(value = ValidGroup1.class) ItemsCustom itemsCustom,
+                                  BindingResult bindingResult) throws Exception{
 
 
+        //在需要校验的pojo前面添加@Validated 在需要校验的pojo后边添加BindingResult 接收校验出错的消息
+        //@Validated和BindingResult bindingResult是配对出现，并且形参顺序是固定的（一前一后）。
+
+        //获取校验错误信息
+        if(bindingResult.hasErrors()){
+            List<ObjectError> allErrors = bindingResult.getAllErrors();
+
+            for (ObjectError objectError:allErrors){
+                System.out.println(objectError.getDefaultMessage());
+            }
+
+            //将错误信息传到页面
+            model.addAttribute("allErrors",allErrors);
+
+            //可以直接使用model将提交pojo回显到页面
+            model.addAttribute("items",itemsCustom);
+
+            //出错重回到商品修改页面
+            return "/items/editItems";
+
+        }
 
         //调用service更新商品信息，页面需要将商品信息传到此方法
         itemsService.updateItems(id, itemsCustom);
@@ -114,5 +161,44 @@ public class ItemsController {
 
         return "/items/success";
     }
+
+
+    //批量删除商品信息
+    @RequestMapping("/deleteItems")
+    public String deleteItems(Integer[] items_id) throws Exception{
+
+        //调用service批量删除商品
+        //service 服务暂时省略
+        return "/items/success";
+
+    }
+
+    //批量修改商品页面，将商品信息查询出来，在页面中可以编辑商品信息
+
+    @RequestMapping("/editItemsQuery")
+    public ModelAndView editItemsQuery(HttpServletRequest request,ItemsQueryVo itemsQueryVo) throws Exception{
+        //调用service查找数据库，查询商品列表
+        List<ItemsCustom> itemsList = itemsService.findItemsList(itemsQueryVo);
+
+
+        //返回ModelAndView
+        ModelAndView modelAndView = new ModelAndView();
+        //相当于request的setAttribute
+        modelAndView.addObject("itemsList",itemsList);
+
+        modelAndView.setViewName("/items/editItemsQuery");
+
+        return modelAndView;
+    }
+
+    //批量修改商品提交
+    //通过ItemQueryVo接收批量提交的商品信息，将商品信息存储到itemsQueryVo中itemsList属性中
+    @RequestMapping("/editItemsAllSubmit")
+    public String editItemsAllSubmit(ItemsQueryVo itemsQueryVo) throws Exception{
+
+
+        return "/items/success";
+    }
+
 
 }

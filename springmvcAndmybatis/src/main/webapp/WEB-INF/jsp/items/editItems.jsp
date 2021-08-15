@@ -13,7 +13,14 @@
     <title>修改商品信息</title>
 </head>
 <body>
-<form id="itemForm" action="${pageContext.request.contextPath }/items/editItemsSubmit.action" method="post" >
+<%--显示错误信息--%>
+<c:if test="${allErrors!=null}">
+    <c:forEach items="${allErrors}" var="error">
+        ${error.defaultMessage}
+    </c:forEach>
+</c:if>
+<form id="itemF
+orm" action="${pageContext.request.contextPath }/items/editItemsSubmit.action" method="post" >
     <input type="hidden" name="id" value="${itemsCustom.id }"/>
     修改商品信息：
     <table width="100%" border=1>

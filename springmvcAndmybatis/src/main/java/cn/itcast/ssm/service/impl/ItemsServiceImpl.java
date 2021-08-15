@@ -2,6 +2,7 @@ package cn.itcast.ssm.service.impl;
 
 import java.util.List;
 
+import cn.itcast.ssm.exception.CustomException;
 import cn.itcast.ssm.mapper.ItemsMapper;
 import cn.itcast.ssm.po.Items;
 import org.springframework.beans.BeanUtils;
@@ -38,6 +39,11 @@ public class ItemsServiceImpl implements ItemsService{
 	@Override
 	public ItemsCustom findItemsById(Integer id) throws Exception {
 		Items items = itemsMapper.selectByPrimaryKey(id);
+
+		//判断商品是否为空，根据id没有差选到商品，抛出异常，提示用户商品信息不存在
+		if(items == null){
+			throw new CustomException("修改的商品信息不存在");
+		}
 
 		//中间对商品信息进行业务处理
 		// ......
