@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.UUID;
+
 /**
  * Json数据在SpringMVC中的使用
  */
@@ -34,6 +36,9 @@ public class JsonTest {
         return itemsCustom;
 
     }
+
+
+
 
 
 }

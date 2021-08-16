@@ -15,12 +15,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Controller
@@ -124,7 +127,8 @@ public class ItemsController {
     @RequestMapping("/editItemsSubmit")
     public String editItemsSubmit(Model model, HttpServletRequest request, Integer id,
                                   @Validated(value = ValidGroup1.class) ItemsCustom itemsCustom,
-                                  BindingResult bindingResult) throws Exception{
+                                  BindingResult bindingResult, MultipartFile items_pic) throws Exception{
+        //MultipartFile items_pic 接收商品图片
 
 
         //在需要校验的pojo前面添加@Validated 在需要校验的pojo后边添加BindingResult 接收校验出错的消息
@@ -146,6 +150,35 @@ public class ItemsController {
 
             //出错重回到商品修改页面
             return "/items/editItems";
+
+        }
+
+        //原始名称
+        String originaFilename = items_pic.getOriginalFilename();
+
+        //上传图片
+        if(items_pic != null && originaFilename != null && originaFilename.length()>0){
+            //存储图片额物理路径
+            String pic_path = "F:\\develop\\upload\\temp\\";
+
+
+           /* public static void main(String[] args) {
+                String s = "liguang.jpg";
+                String name = UUID.randomUUID() +s.substring(s.lastIndexOf("."));
+                System.out.println(name);
+
+            }*/
+            //新的图片名称
+            String newFileName = UUID.randomUUID() + originaFilename.substring(originaFilename.lastIndexOf("."));
+
+            //新图片
+            File newFile = new File(pic_path + newFileName);
+
+            //将内存中的数据写入磁盘
+            items_pic.transferTo(newFile);
+            //将新图片名称写到itemsCustom中
+            itemsCustom.setPic(newFileName);
+
 
         }
 

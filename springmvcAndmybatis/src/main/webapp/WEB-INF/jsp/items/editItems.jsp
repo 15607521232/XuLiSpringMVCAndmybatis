@@ -19,8 +19,8 @@
         ${error.defaultMessage}
     </c:forEach>
 </c:if>
-<form id="itemF
-orm" action="${pageContext.request.contextPath }/items/editItemsSubmit.action" method="post" >
+<%--enctype="multipart/form-data" 代表支持上传图片--%>
+<form id="itemForm" action="${pageContext.request.contextPath }/items/editItemsSubmit.action" method="post" enctype="multipart/form-data">
     <input type="hidden" name="id" value="${itemsCustom.id }"/>
     修改商品信息：
     <table width="100%" border=1>
@@ -43,7 +43,7 @@ orm" action="${pageContext.request.contextPath }/items/editItemsSubmit.action" m
                     <img src="/pic/${item.pic}" width=100 height=100/>
                     <br/>
                 </c:if>
-                <input type="file"  name="pictureFile"/>
+                <input type="file"  name="items_pic"/>
             </td>
         </tr>
         <tr>
