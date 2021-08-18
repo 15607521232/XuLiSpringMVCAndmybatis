@@ -27,6 +27,11 @@
     <!--注解适配器-->
     <!--<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"></bean>-->
 
+    <!--静态资源解析器 js、css、img-->
+    <mvc:resources mapping="/js/**" location="/js/"></mvc:resources>
+    <mvc:resources mapping="/img/**" location="/img/"></mvc:resources>
+    <mvc:resources mapping="/css/**" location="/css/"></mvc:resources>
+
 
     <!--使用mvc:annotation-driven代替上边的注解映射器、注解适配器
 
@@ -91,4 +96,22 @@
             <value>5242880</value>
         </property>
     </bean>
+
+    <!--拦截器-->
+    <mvc:interceptors>
+        <!--多个拦截器顺序执行-->
+        <mvc:interceptor>
+            <!--/**/ 表示所有url包括子url路径-->
+            <mvc:mapping path="/**/"></mvc:mapping>
+             <bean class="cn.itcast.ssm.interceptor.interceptor1"></bean>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**/"/>
+            <bean class="cn.itcast.ssm.interceptor.interceptor2"></bean>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**/"/>
+            <bean class="cn.itcast.ssm.interceptor.LoginInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
 </beans>
